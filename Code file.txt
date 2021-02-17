@@ -1,0 +1,45 @@
+import re
+import datetime
+import pandas as pd
+class LogMining:
+    def __init__(self, text):
+        self.text=text
+    def logicToExtract(self):
+        dataextraction=['(^A2)([a-zA-Z0-9 ]*)(["][A-Z]*["])([A-Za-z\"\s ]*)([\d]*[.][\d]*)([a-z ]*)(#[\d]{14})']
+        matches=[]
+        arr=[]
+        for r in dataextraction:
+            matches +=re.findall(r, data)
+            if matches != []:
+                #print(matches[0][6])
+                arr.append(matches[0][4])
+                #print(type(arr))
+        for a in arr:
+            #print(type(a))
+            minutes=round(float(a)/60, 2)
+            hours=round(float(a)/3600, 2)
+            print("minutes:",minutes,"hours:",hours)
+            end_date= matches[0][6]
+            year= end_date[1:5]
+            month= end_date[5:7]
+            month_number = datetime.datetime.strptime(month, "%m")
+            month_name = month_number.strftime("%b")
+            date= end_date[7:9]
+            hour= end_date[9:11]
+            mins= end_date[11:13]
+            secs= end_date[13:15]
+            date_alone= date+'-'+month_name+'-'+year
+            time_alone= hour+':'+mins+':'+secs
+            combined= month+'/'+date+'/'+year+' '+time_alone
+            print('date_alone',date_alone,'time_alone',time_alone,'combined',combined)
+            df = pd.DataFrame({'Table Name': matches[0][2], 'TIME TAKEN(seconds)': matches[0][4], 'TIME TAKEN(min)': minutes,
+                             'TIME TAKEN(Hrs)': hours, 'End Date': matches[0][6], 'Date': date_alone, 'Time': time_alone, 'Time': time_alone, 'Combined': combined}, index=[1])
+            writer = pd.ExcelWriter('demo3.xlsx', engine='xlsxwriter')
+            df.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
+logfile=open(r'C:\Users\ksaideep\Desktop\sample.log')
+lines=logfile.readlines()
+for line in lines:
+    data="".join(line)
+    t1=LogMining(data)
+    t1.logicToExtract()
